@@ -16,8 +16,8 @@ export default function Home() {
   } = useQuote();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
-      <h1 className="mb-8 text-4xl font-bold text-center text-gray-800">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      <h1 className="mb-8 text-4xl font-bold text-center text-gray-800 dark:text-gray-100">
         Inspirational Quote Generator
       </h1>
       
@@ -35,7 +35,7 @@ export default function Home() {
         />
       )}
       
-      <footer className="mt-12 text-center text-gray-500">
+      <footer className="mt-12 text-center text-gray-500 dark:text-gray-400">
         <p>Built with Next.js 15 and Tailwind CSS</p>
       </footer>
     </main>
