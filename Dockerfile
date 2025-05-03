@@ -1,0 +1,59 @@
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies
+RUN npm ci
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Next.js collects anonymous telemetry data about general usage
+# Learn more here: https://nextjs.org/telemetry
+# Uncomment the following line to disable telemetry
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+# Build Next.js app
+RUN npm run build
+
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+# Uncomment the following line to disable telemetry during runtime
+# ENV NEXT_TELEMETRY_DISABLED 1
+
+# Don't run as root
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
+
+# Copy necessary files
+COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Copy built app
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Expose port
+EXPOSE 3000
+
+# Set appropriate environment variables
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+# Start the app
+CMD ["node", "server.js"] 
