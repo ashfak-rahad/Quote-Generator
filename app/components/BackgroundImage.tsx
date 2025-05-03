@@ -7,57 +7,67 @@ type BackgroundImageProps = {
   triggerChange?: number;
 }
 
-export default function BackgroundImage({ triggerChange = 0 }: BackgroundImageProps) {
-  const [imageData, setImageData] = useState({
-    imageUrl: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-    imageCredit: 'Kalen Emsley',
-    imageProfile: 'https://unsplash.com/@kalenemsley',
-    imageAlt: 'Mountain landscape with lake view'
-  });
+// Array of pre-defined Unsplash images to ensure reliability
+const BACKGROUND_IMAGES = [
+  {
+    url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Mountain landscape with lake view'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Beautiful forest landscape'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Scenic mountain valley'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Sunset over the ocean'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Sunlight through forest trees'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Beautiful countryside landscape'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Sunset with beautiful sky'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
+    alt: 'Mountain reflected in lake'
+  }
+];
 
-  // Function to get a random scenery image from Unsplash
-  const getRandomUnsplashImage = () => {
-    // Use Unsplash Source API for random nature images
-    // Using a fixed width (1920) and height (1080) for performance
-    const categories = ['nature', 'landscape', 'mountains', 'ocean', 'forest', 'sunset'];
-    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const imageUrl = `https://source.unsplash.com/1920x1080/?${randomCategory}`;
-    
-    // Fetch to trigger the random image generation
-    fetch(imageUrl)
-      .then(response => {
-        // The response URL contains the actual random image URL
-        const photographerMatch = response.url.match(/photo-([^?]+)/);
-        const photographerId = photographerMatch ? photographerMatch[1].split('-')[0] : 'unknown';
-        
-        setImageData({
-          imageUrl: response.url,
-          imageCredit: 'Unsplash Photographer',
-          imageProfile: `https://unsplash.com/photos/${photographerId}`,
-          imageAlt: `Beautiful ${randomCategory} scenery`
-        });
-      })
-      .catch(error => {
-        console.error('Error fetching random image:', error);
-      });
+export default function BackgroundImage({ triggerChange = 0 }: BackgroundImageProps) {
+  const [imageData, setImageData] = useState(BACKGROUND_IMAGES[0]);
+
+  // Function to get a random image from our predefined array
+  const getRandomImage = () => {
+    const randomIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+    return BACKGROUND_IMAGES[randomIndex];
   };
 
   // Change the background image when triggerChange changes
   useEffect(() => {
-    getRandomUnsplashImage();
+    setImageData(getRandomImage());
   }, [triggerChange]);
 
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden">
       <div className="absolute inset-0 bg-black/30 z-10" /> {/* Dark overlay for better text readability */}
       <Image
-        src={imageData.imageUrl}
-        alt={imageData.imageAlt}
+        src={imageData.url}
+        alt={imageData.alt}
         fill
         priority
         className="object-cover"
         sizes="100vw"
-        unoptimized={false} // Let Next.js optimize the image
+        unoptimized={true} // Since we're in static export mode, set to true
       />
       <div className="absolute bottom-2 right-2 text-white text-xs opacity-70 z-20">
         Photo from <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="underline">Unsplash</a>
