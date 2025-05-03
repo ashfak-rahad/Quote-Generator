@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuote } from './hooks/useQuote';
 import QuoteCard from './components/QuoteCard';
 import QuoteSourceSelector from './components/QuoteSourceSelector';
@@ -7,6 +8,7 @@ import LoadingQuote from './components/LoadingQuote';
 import BackgroundImage from './components/BackgroundImage';
 
 export default function Home() {
+  const [bgTrigger, setBgTrigger] = useState(0);
   const { 
     quote, 
     isLoading, 
@@ -16,9 +18,16 @@ export default function Home() {
     setQuoteSource 
   } = useQuote();
 
+  // Function to handle fetching a new quote and changing the background
+  const handleNewQuote = async () => {
+    await fetchNewQuote();
+    // Increment the trigger to cause the background image to change
+    setBgTrigger(prev => prev + 1);
+  };
+
   return (
     <>
-      <BackgroundImage />
+      <BackgroundImage triggerChange={bgTrigger} />
       <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-transparent transition-colors duration-200">
         <h1 className="mb-8 text-4xl font-bold text-center text-white">
           Inspirational Quote Generator
@@ -26,14 +35,18 @@ export default function Home() {
         
         <QuoteSourceSelector 
           quoteSource={quoteSource} 
-          onSourceChange={setQuoteSource} 
+          onSourceChange={(source) => {
+            setQuoteSource(source);
+            // Also trigger a background change when source changes
+            setBgTrigger(prev => prev + 1);
+          }} 
           disabled={isLoading} 
         />
         
         {isLoading ? <LoadingQuote /> : (
           <QuoteCard 
             initialQuote={quote} 
-            onNewQuote={fetchNewQuote} 
+            onNewQuote={handleNewQuote} 
             isError={isError}
           />
         )}

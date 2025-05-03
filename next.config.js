@@ -4,11 +4,15 @@ const nextConfig = {
   output: 'export',
   images: {
     unoptimized: true,
-    domains: ['images.unsplash.com'],
+    domains: ['images.unsplash.com', 'source.unsplash.com'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'source.unsplash.com',
       },
     ],
   },
